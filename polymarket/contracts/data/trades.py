@@ -20,7 +20,7 @@ class Side(str, Enum):
 
 class TradesParams(BaseModel):
     limit: int | None = Field(default=100, ge=0, le=10000)
-    offset: int | None = Field(default=0, ge=0, le=10000)
+    offset: int | None = Field(default=0, ge=0, le=100000)
     takerOnly: bool | None = Field(default=True)
     filterType: FilterType | None = None   # must be paired with filterAmount
     filterAmount: float | None = Field(default=None, ge=0)  # must be paired with filterType
