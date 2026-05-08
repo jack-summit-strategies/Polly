@@ -14,6 +14,7 @@ from .gamma import (
 )
 from .data import FilterType, Side, TradesParams, Trade
 from .clob import PriceHistoryParams, PricePoint, PriceHistory
+from .subgraph import EventType, MarketActivityParams, TokenActivity, TokenActivityMarket, MarketActivityResponse
 
 __all__ = [
     # gamma
@@ -38,4 +39,10 @@ __all__ = [
     "PriceHistoryParams",
     "PricePoint",
     "PriceHistory",
+    # subgraph
+    "EventType",
+    "MarketActivityParams",
+    "TokenActivity",
+    "TokenActivityMarket",
+    "MarketActivityResponse",
 ]
