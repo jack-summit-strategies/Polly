@@ -1,3 +1,4 @@
+import urllib.parse
 import requests
 
 from ..contracts.gamma import Event, EventsParams, Profile, ProfileParams, Tag
@@ -37,7 +38,13 @@ class GammaAPI:
         if limiter:
             limiter.acquire()
         url = f"{self.BASE_URL}{path}"
-        response = self.session.get(url, params=params, timeout=self.timeout)
+        if params:
+            qs = "&".join(
+                f"{k}={urllib.parse.quote(str(v), safe=':')}"
+                for k, v in params.items()
+            )
+            url = f"{url}?{qs}"
+        response = self.session.get(url, timeout=self.timeout)
         response.raise_for_status()
         return response.json()
 
