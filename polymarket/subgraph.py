@@ -7,30 +7,17 @@ class PolymarketSubgraph:
     """Client for querying Polymarket data from The Graph subgraph."""
 
     BASE_URL = "https://gateway.thegraph.com/api/[api-key]/subgraphs/id/81Dm16JjuFSrqz813HysXoUPvzTwE7fsfPk2RTf66nyC"
-    # Note: Replace [api-key] with your actual API key from https://thegraph.com/studio
 
     def __init__(self, api_key: str = None):
-        """Initialize subgraph client.
-
-        Args:
-            api_key: The Graph API key. If None, uses public endpoint (rate limited).
-        """
+        """Init client with optional API key. Uses public endpoint if None."""
         self.api_key = api_key
         if api_key:
             self.endpoint = f"https://gateway.thegraph.com/api/{api_key}/subgraphs/id/81Dm16JjuFSrqz813HysXoUPvzTwE7fsfPk2RTf66nyC"
         else:
-            # Public endpoint without auth
             self.endpoint = "https://arbitrum.thegraph.com/subgraphs/name/polymarket/polymarket"
 
     def _query(self, query_string: str) -> dict:
-        """Execute a GraphQL query.
-
-        Args:
-            query_string: GraphQL query string
-
-        Returns:
-            Response data dictionary
-        """
+        """Execute GraphQL query and return response data."""
         payload = {"query": query_string}
         response = requests.post(self.endpoint, json=payload, timeout=30)
         response.raise_for_status()
@@ -43,16 +30,7 @@ class PolymarketSubgraph:
         return data.get("data", {})
 
     def get_market_trades(self, condition_id: str, first: int = 1000, skip: int = 0) -> list[dict]:
-        """Fetch trades for a specific market condition.
-
-        Args:
-            condition_id: The market condition ID (0x-prefixed hex)
-            first: Number of trades to fetch (max 1000)
-            skip: Number of trades to skip (for pagination)
-
-        Returns:
-            List of trade records
-        """
+        """Fetch trades for a market (paginated)."""
         query = f"""
         query {{
             orderFilleds(
@@ -80,16 +58,7 @@ class PolymarketSubgraph:
         return result.get("orderFilleds", [])
 
     def get_wallet_trades(self, wallet: str, first: int = 1000, skip: int = 0) -> list[dict]:
-        """Fetch all trades by a specific wallet.
-
-        Args:
-            wallet: Wallet address (0x-prefixed)
-            first: Number of trades to fetch
-            skip: Number of trades to skip
-
-        Returns:
-            List of trade records
-        """
+        """Fetch trades by wallet (paginated)."""
         query = f"""
         query {{
             orderFilleds(
@@ -116,16 +85,7 @@ class PolymarketSubgraph:
         return result.get("orderFilleds", [])
 
     def get_large_trades(self, min_shares: int = 10000, first: int = 1000, skip: int = 0) -> list[dict]:
-        """Fetch large trades (whale activity).
-
-        Args:
-            min_shares: Minimum trade size in shares
-            first: Number of trades to fetch
-            skip: Number of trades to skip
-
-        Returns:
-            List of large trade records
-        """
+        """Fetch large trades by minimum share size."""
         query = f"""
         query {{
             orderFilleds(
@@ -153,16 +113,7 @@ class PolymarketSubgraph:
         return result.get("orderFilleds", [])
 
     def get_trades_by_time_range(self, start_time: int, end_time: int, first: int = 1000) -> list[dict]:
-        """Fetch trades within a time range.
-
-        Args:
-            start_time: Unix timestamp (seconds) for start
-            end_time: Unix timestamp (seconds) for end
-            first: Number of trades to fetch
-
-        Returns:
-            List of trade records
-        """
+        """Fetch trades within Unix timestamp range."""
         query = f"""
         query {{
             orderFilleds(
@@ -187,15 +138,7 @@ class PolymarketSubgraph:
         return result.get("orderFilleds", [])
 
     def get_market_positions(self, condition_id: str, first: int = 1000) -> list[dict]:
-        """Fetch current positions in a market.
-
-        Args:
-            condition_id: Market condition ID
-            first: Number of positions to fetch
-
-        Returns:
-            List of position records
-        """
+        """Fetch current positions for a market."""
         query = f"""
         query {{
             positions(
@@ -215,14 +158,7 @@ class PolymarketSubgraph:
         return result.get("positions", [])
 
     def get_market_info(self, condition_id: str) -> dict:
-        """Fetch metadata for a market.
-
-        Args:
-            condition_id: Market condition ID
-
-        Returns:
-            Market metadata
-        """
+        """Fetch market metadata."""
         query = f"""
         query {{
             conditions(where: {{id: "{condition_id}"}}) {{
