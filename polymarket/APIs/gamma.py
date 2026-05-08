@@ -1,7 +1,7 @@
 import urllib.parse
 import requests
 
-from ..contracts.gamma import Event, EventsParams, Profile, ProfileParams
+from ..contracts.gamma import Event, EventsParams, Profile, ProfileParams, Tag
 from ..util.rate_limiter import RateLimiter
 
 # Rate limits (per 10 seconds):
@@ -26,6 +26,7 @@ class GammaAPI:
         self.session = requests.Session()
         self._limiters = {
             "/events": RateLimiter(max_calls=500, period=10),
+            "/tags": RateLimiter(max_calls=200, period=10),
         }
 
     #
@@ -62,3 +63,8 @@ class GammaAPI:
         raw_params = params.model_dump(exclude_none=True)
         data = self._get("/public-profile", params=raw_params)
         return Profile.model_validate(data)
+
+    # /tags
+    def get_tags(self) -> list[Tag]:
+        data = self._get("/tags")
+        return [Tag.model_validate(item) for item in data]
