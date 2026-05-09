@@ -2,6 +2,7 @@ from .APIs.gamma import GammaAPI
 from .APIs.data import DataAPI
 from .APIs.clob import ClobAPI
 from .APIs.subgraph import Subgraph
+from .util.time import to_unix, from_unix
 
 
 class Polymarket:
@@ -10,3 +11,9 @@ class Polymarket:
         self.data = DataAPI(timeout=timeout)
         self.clob = ClobAPI(timeout=timeout)
         self.subgraph = Subgraph(api_key=subgraph_api_key, jwt_token=subgraph_jwt_token)
+
+    def to_unix(self, date_str: str) -> int:
+        return to_unix(date_str)
+
+    def from_unix(self, timestamp: int) -> str:
+        return from_unix(timestamp)
