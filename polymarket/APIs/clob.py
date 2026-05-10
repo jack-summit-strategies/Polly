@@ -43,5 +43,25 @@ class ClobAPI:
     # /price-history - Endpoint — Rate Limit => 9,000 req / 10s (general)
     def get_price_history(self, params: PriceHistoryParams) -> PriceHistory:
         raw_params = params.model_dump(exclude_none=True)
-        data = self._get("/price-history", params=raw_params)
+        data = self._get("/prices-history", params=raw_params)
         return PriceHistory.model_validate(data)
+
+    def get_price_history_chunked(self, params: PriceHistoryParams) -> PriceHistory:
+        SEVEN_DAYS = 7 * 24 * 60 * 60
+
+        start = params.startTs
+        end = params.endTs
+
+        if start is None or end is None or (end - start) <= SEVEN_DAYS:
+            return self.get_price_history(params)
+
+        all_points: list = []
+        chunk_start = start
+        while chunk_start < end:
+            chunk_end = min(chunk_start + SEVEN_DAYS, end)
+            chunk_params = params.model_copy(update={"startTs": chunk_start, "endTs": chunk_end})
+            result = self.get_price_history(chunk_params)
+            all_points.extend(result.history)
+            chunk_start = chunk_end
+
+        return PriceHistory(history=all_points)
