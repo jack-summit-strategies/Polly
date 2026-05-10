@@ -195,6 +195,19 @@ class Subgraph:
     #   Rest Functions
     #
 
+    # Fetch first page of market activity only
+    def get_market_activity_page(self, params: MarketActivityParams) -> MarketActivityResponse:
+        query = {k: v for k, v in params.model_dump().items() if v is not None}
+        query["page"] = 1
+        response = requests.get(
+            self.TOKENS_URL,
+            params=query,
+            headers={"Authorization": f"Bearer {self.jwt_token}"},
+            timeout=30,
+        )
+        response.raise_for_status()
+        return MarketActivityResponse.model_validate(response.json())
+
     #Fetch all market activity from the Market API, paginating until data is empty
     def get_market_activity(self, params: MarketActivityParams) -> MarketActivityResponse:
         base_query = {k: v for k, v in params.model_dump().items() if v is not None}
@@ -216,8 +229,5 @@ class Subgraph:
                 break
             all_data.extend(result.data)
             page += 1
-
-            if page > 3:
-                break
 
         return MarketActivityResponse(data=all_data)

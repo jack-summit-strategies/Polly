@@ -20,8 +20,8 @@ class MarketActivityParams(BaseModel):
     token_id: str | None = None
     condition_id: str | None = None
     event_type: EventType | None = None
-    start_time: str
-    end_time: str
+    start_time: str = "1577836800"  # 2020-01-01
+    end_time: str = "1893456000"    # 2030-01-01
     limit: int | None = Field(default=10, ge=1, le=1000)
     page: int | None = Field(default=1, ge=1, le=767465558638)
 
