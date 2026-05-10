@@ -1,6 +1,6 @@
 import requests
 
-from ..contracts.data import Trade, TradesParams
+from ..contracts.data import Trade, TradesParams, MarketPositionsParams, MarketPositionGroup, TradedParams, Traded
 from ..util.rate_limiter import RateLimiter
 
 # Rate limits (per 10 seconds):
@@ -23,6 +23,7 @@ class DataAPI:
         self.session = requests.Session()
         self._limiters = {
             "/trades": RateLimiter(max_calls=200, period=10),
+            "/v1/market-positions": RateLimiter(max_calls=150, period=10),
         }
 
     #
@@ -42,8 +43,21 @@ class DataAPI:
     #   Endpoints
     #
 
+    # /traded — Rate Limit => General (1,000 req / 10s)
+    def get_traded(self, params: TradedParams) -> Traded:
+        raw_params = params.model_dump(exclude_none=True)
+        data = self._get("/traded", params=raw_params)
+        return Traded.model_validate(data)
+
+    # /v1/market-positions — Rate Limit => 150 req / 10s
+    def get_market_positions(self, params: MarketPositionsParams) -> list[MarketPositionGroup]:
+        raw_params = params.model_dump(exclude_none=True)
+        data = self._get("/v1/market-positions", params=raw_params)
+        return [MarketPositionGroup.model_validate(item) for item in data]
+
     # /trades - Endpoint — Rate Limit => 200 req / 10s
     def get_trades(self, params: TradesParams | None = None) -> list[Trade]:
         raw_params = params.model_dump(exclude_none=True) if params else {}
         data = self._get("/trades", params=raw_params)
         return [Trade.model_validate(item) for item in data]
+

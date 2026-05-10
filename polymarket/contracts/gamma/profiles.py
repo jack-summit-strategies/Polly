@@ -16,12 +16,6 @@ class ProfileParams(BaseModel):
 # Response
 # ---------------------------------------------------------------------------
 
-class ProfileUser(BaseModel):
-    id: str | None = None
-    creator: bool | None = None
-    mod: bool | None = None
-
-
 class Profile(BaseModel):
     createdAt: datetime | None = None
     proxyWallet: str | None = None
@@ -33,3 +27,10 @@ class Profile(BaseModel):
     users: list[ProfileUser] | None = None
     xUsername: str | None = None
     verifiedBadge: bool | None = None
+
+
+
+class ProfileUser(BaseModel):
+    id: str | None = None
+    creator: bool | None = None
+    mod: bool | None = None
